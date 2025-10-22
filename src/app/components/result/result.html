@@ -1,0 +1,104 @@
+<div class="result-container">
+  <div class="result-card">
+    <!-- Success Header -->
+    <div class="header-section">
+      <div class="success-icon">{{ getGradeEmoji() }}</div>
+      <h1 class="title">Verification Complete!</h1>
+      <h2 class="grade">{{ getOverallGrade() }}</h2>
+      <p class="subtitle">
+        Congratulations! You have successfully proven that you are not a bot.
+      </p>
+    </div>
+
+    <!-- Results Summary -->
+    <div class="stats-section">
+      <h3 class="stats-title">Your Performance</h3>
+      
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value">{{ getCompletedChallenges() }}/3</div>
+          <div class="stat-label">Challenges Completed</div>
+        </div>
+        
+        <div class="stat-item">
+          <div class="stat-value">{{ getTotalAttempts() }}</div>
+          <div class="stat-label">Total Attempts</div>
+        </div>
+        
+        <div class="stat-item">
+          <div class="stat-value">{{ successRate.toFixed(0) }}%</div>
+          <div class="stat-label">Success Rate</div>
+        </div>
+        
+        <div class="stat-item">
+          <div class="stat-value">{{ formatTime(totalTime) }}</div>
+          <div class="stat-label">Total Time</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Challenge Breakdown -->
+    <div class="breakdown-section" *ngIf="results.length > 0">
+      <h3 class="breakdown-title">Challenge Results</h3>
+      
+      <div class="challenge-list">
+        <div 
+          *ngFor="let result of results; let i = index" 
+          class="challenge-item correct">
+          
+          <div class="challenge-info">
+            <span class="challenge-number">Challenge {{ i + 1 }}</span>
+            <span class="challenge-attempts">
+              Completed in {{ result.attemptNumber }} attempt{{ result.attemptNumber > 1 ? 's' : '' }}
+            </span>
+            <span class="challenge-time">{{ formatTime(result.timeSpent) }}</span>
+          </div>
+          
+          <div class="challenge-status">
+            <span class="status-icon">✓</span>
+            <span class="status-text">Completed</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="attempts-summary" *ngIf="getTotalAttempts() > getCompletedChallenges()">
+        <p class="attempts-text">
+          <strong>{{ getTotalAttempts() - getCompletedChallenges() }}</strong> 
+          additional attempt{{ (getTotalAttempts() - getCompletedChallenges()) > 1 ? 's' : '' }} 
+          were needed across all challenges.
+        </p>
+      </div>
+    </div>
+
+    <!-- Achievement Badge -->
+    <div class="achievement-section" *ngIf="successRate === 100">
+      <div class="achievement-badge">
+        <div class="badge-icon">🏆</div>
+        <div class="badge-title">Perfect Score!</div>
+        <div class="badge-subtitle">You aced every challenge</div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-section">
+      <button 
+        class="btn btn-primary"
+        (click)="startNewChallenge()">
+        Take Another Challenge
+      </button>
+      
+      <button 
+        class="btn btn-secondary"
+        (click)="goHome()">
+        Return Home
+      </button>
+    </div>
+
+    <!-- Security Message -->
+    <div class="security-section">
+      <p class="security-text">
+        🔒 Your verification has been recorded. You are now authenticated as a human user.
+      </p>
+    </div>
+  </div>
+</div>
