@@ -2,9 +2,7 @@
   <!-- Progress Bar -->
   <div class="progress-section">
     <div class="progress-bar">
-      <div 
-        class="progress-fill" 
-        [style.width.%]="getProgressPercentage()">
+      <div class="progress-fill" [style.width.%]="getProgressPercentage()">
       </div>
     </div>
     <span class="progress-text">
@@ -19,22 +17,11 @@
 
     <!-- Image Selection Challenge -->
     <div *ngIf="currentChallenge.type === ChallengeType.IMAGE_SELECTION" class="image-challenge">
-      <div class="demo-instructions">
-        <p><strong>Demo Mode:</strong> In a real CAPTCHA, these would be actual photos. 
-        For this demo, the <em>colored squares</em> represent the target images.</p>
-      </div>
       <div class="image-grid" [class]="'grid-' + getImageSelectionData()?.gridSize">
-        <div 
-          *ngFor="let image of getImageSelectionData()?.images" 
-          class="image-item"
-          [class.selected]="isImageSelected(image.id)"
-          (click)="onImageSelect(image.id)">
-          <div class="placeholder-image" [attr.data-category]="getImageCategory(image)">
-            <div class="placeholder-content">
-              <span class="placeholder-icon">{{ getImageIcon(image) }}</span>
-              <div class="demo-label">DEMO</div>
-            </div>
-          </div>
+        <div *ngFor="let image of getImageSelectionData()?.images" class="image-item"
+          [class.selected]="isImageSelected(image.id)" (click)="onImageSelect(image.id)">
+          <img [src]="image.url" [alt]="" image.alt class="captcha-image" [attr.data-category]="getImageCategory(image)"
+            (error)="onImageError($event)" loading="lazy">
           <div class="image-overlay" *ngIf="isImageSelected(image.id)">
             <span class="checkmark">✓</span>
           </div>
@@ -45,45 +32,28 @@
     <!-- Math Problem Challenge -->
     <div *ngIf="currentChallenge.type === ChallengeType.MATH_PROBLEM" class="math-challenge">
       <div class="math-question">{{ getMathProblemData()?.question }}</div>
-      <input 
-        type="number" 
-        class="math-input"
-        [(ngModel)]="mathAnswer"
-        placeholder="Enter your answer"
-        min="0">
+      <input type="number" class="math-input" [(ngModel)]="mathAnswer" placeholder="Enter your answer" min="0">
     </div>
 
     <!-- Text Input Challenge -->
     <div *ngIf="currentChallenge.type === ChallengeType.TEXT_INPUT" class="text-challenge">
       <div class="text-prompt">{{ getTextInputData()?.prompt }}</div>
-      <input 
-        type="text" 
-        class="text-input"
-        [(ngModel)]="textInput"
-        placeholder="Type the text exactly as shown">
+      <input type="text" class="text-input" [(ngModel)]="textInput" placeholder="Type the text exactly as shown">
     </div>
 
     <!-- Validation Message -->
-    <div 
-      class="validation-message" 
-      [class.show]="showValidation"
+    <div class="validation-message" [class.show]="showValidation"
       [class.error]="validationMessage.includes('Incorrect') || validationMessage.includes('Please')">
       {{ validationMessage }}
     </div>
 
     <!-- Action Buttons -->
     <div class="action-buttons">
-      <button 
-        class="btn btn-secondary"
-        [disabled]="!canGoPrevious()"
-        (click)="previousChallenge()">
+      <button class="btn btn-secondary" [disabled]="!canGoPrevious()" (click)="previousChallenge()">
         Previous
       </button>
-      
-      <button 
-        class="btn btn-primary"
-        [disabled]="!isFormValid()"
-        (click)="submitAnswer()">
+
+      <button class="btn btn-primary" [disabled]="!isFormValid()" (click)="submitAnswer()">
         {{ currentChallengeIndex === challenges.length - 1 ? 'Complete' : 'Next' }}
       </button>
     </div>

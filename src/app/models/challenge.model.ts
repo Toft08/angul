@@ -45,6 +45,8 @@ export interface UserProgress {
   endTime?: Date;
   score: number;
   totalAttempts: number;
+  challengeSetId?: number; // Track which challenge set is being used
+  sessionId?: string; // Unique session identifier
 }
 
 export interface ChallengeResult {

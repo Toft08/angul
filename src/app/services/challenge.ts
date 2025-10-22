@@ -1,19 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { 
-  Challenge, 
-  ChallengeType, 
-  ImageSelectionData, 
-  MathProblemData, 
+import {
+  Challenge,
+  ChallengeType,
+  ImageSelectionData,
+  MathProblemData,
   TextInputData,
-  ImageItem 
+  ImageItem
 } from '../models/challenge.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChallengeService {
-  
+  private readonly CHALLENGE_SET_KEY = 'angul-it-challenge-set';
+
   private challengeSets: Challenge[][] = [
     this.generateChallengeSet1(),
     this.generateChallengeSet2(),
@@ -23,12 +24,41 @@ export class ChallengeService {
   constructor() { }
 
   public getChallenges(): Observable<Challenge[]> {
-    // Randomly select a challenge set for each session
-    const randomIndex = Math.floor(Math.random() * this.challengeSets.length);
-    return of(this.challengeSets[randomIndex]);
+    // Get persisted challenge set or select a new one
+    const challengeSetId = this.getOrCreateChallengeSetId();
+    return of(this.challengeSets[challengeSetId]);
   }
 
-  public validateAnswer(challenge: Challenge, userAnswer: any): boolean {
+  public getCurrentChallengeSetId(): number {
+    return this.getOrCreateChallengeSetId();
+  }
+
+  public resetChallengeSet(): void {
+    localStorage.removeItem(this.CHALLENGE_SET_KEY);
+  }
+
+  private getOrCreateChallengeSetId(): number {
+    try {
+      const saved = localStorage.getItem(this.CHALLENGE_SET_KEY);
+      if (saved !== null) {
+        const savedId = parseInt(saved, 10);
+        if (savedId >= 0 && savedId < this.challengeSets.length) {
+          return savedId;
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to load challenge set from localStorage:', error);
+    }
+
+    // Generate new challenge set ID if none exists or invalid
+    const newId = Math.floor(Math.random() * this.challengeSets.length);
+    try {
+      localStorage.setItem(this.CHALLENGE_SET_KEY, newId.toString());
+    } catch (error) {
+      console.warn('Failed to save challenge set to localStorage:', error);
+    }
+    return newId;
+  } public validateAnswer(challenge: Challenge, userAnswer: any): boolean {
     switch (challenge.type) {
       case ChallengeType.IMAGE_SELECTION:
         return this.validateImageSelection(challenge, userAnswer);
@@ -44,11 +74,11 @@ export class ChallengeService {
   private validateImageSelection(challenge: Challenge, selectedIds: string[]): boolean {
     const data = challenge.data as ImageSelectionData;
     const correctIds = data.images.filter(img => img.isTarget).map(img => img.id);
-    
+
     if (selectedIds.length !== correctIds.length) return false;
-    
-    return correctIds.every(id => selectedIds.includes(id)) && 
-           selectedIds.every(id => correctIds.includes(id));
+
+    return correctIds.every(id => selectedIds.includes(id)) &&
+      selectedIds.every(id => correctIds.includes(id));
   }
 
   private validateMathProblem(challenge: Challenge, answer: number): boolean {
@@ -58,9 +88,9 @@ export class ChallengeService {
 
   private validateTextInput(challenge: Challenge, text: string): boolean {
     const data = challenge.data as TextInputData;
-    return data.caseSensitive ? 
-           data.expectedText === text : 
-           data.expectedText.toLowerCase() === text.toLowerCase();
+    return data.caseSensitive ?
+      data.expectedText === text :
+      data.expectedText.toLowerCase() === text.toLowerCase();
   }
 
   private generateChallengeSet1(): Challenge[] {
@@ -195,19 +225,59 @@ export class ChallengeService {
   private generateImageGrid(target: string, count: number): ImageItem[] {
     const images: ImageItem[] = [];
     const targetCount = Math.floor(Math.random() * 3) + 2; // 2-4 target images
-    
-    for (let i = 0; i < count; i++) {
-      const isTarget = i < targetCount;
+
+    const targetImages = this.getImagesForCategory(target);
+
+    const otherCategories = ['darts', 'discs', 'targets'].filter(cat => cat !== target);
+    const distractorImages = otherCategories.flatMap(cat => this.getImagesForCategory(cat));
+
+    // Add target images
+    for (let i = 0; i < targetCount && i < targetImages.length; i++) {
       images.push({
         id: `img-${i}`,
-        url: `assets/images/${isTarget ? target : 'other'}/image-${i}.jpg`,
+        url: `assets/images/${target}/${targetImages[i]}`,
         alt: `Image ${i + 1}`, // Generic alt text that doesn't give away the answer
-        isTarget: isTarget
+        isTarget: true
       });
     }
-    
-    // Shuffle the array to randomize positions
+
+    // Fill remaning slots with distractor images
+    for (let i = targetCount; i < count; i++) {
+      const randomDistractor = distractorImages[Math.floor(Math.random() * distractorImages.length)];
+      const category = this.getCategoryFromImage(randomDistractor);
+      images.push({
+        id: `img-${i}`,
+        url: `assets/images/${category}/${randomDistractor}`,
+        alt: `Image ${i + 1}`,
+        isTarget: false
+      });
+    }
+
     return this.shuffleArray(images);
+  }
+
+  private getImagesForCategory(category: string): string[] {
+    switch (category) {
+      case 'darts':
+        return ['DL.jpg', 'JDG.jpg', 'OL.jpg', 'SL.jpg'];
+      case 'discs':
+        return ['buzzz.jpg', 'fd3.jpg', 'reko.jpg', 'zone.jpg'];
+      case 'targets':
+        return ['BD.jpg', 'DK.jpg', 'DKP.jpg', 'WD.jpg'];
+      default:
+        return [];
+    }
+  }
+
+  private getCategoryFromImage(imageName: string): string {
+    const dartImages = ['DL.jpg', 'JDG.jpg', 'OL.jpg', 'SL.jpg'];
+    const discImages = ['buzzz.jpg', 'fd3.jpg', 'reko.jpg', 'zone.jpg'];
+    const targetImages = ['BD.jpg', 'DK.jpg', 'DKP.jpg', 'WD.jpg'];
+
+    if (dartImages.includes(imageName)) return 'darts';
+    if (discImages.includes(imageName)) return 'discs';
+    if (targetImages.includes(imageName)) return 'targets';
+    return 'other';
   }
 
   private shuffleArray<T>(array: T[]): T[] {

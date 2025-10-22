@@ -6,14 +6,14 @@ import { Subscription } from 'rxjs';
 
 import { StateService } from '../../services/state';
 import { ChallengeService } from '../../services/challenge';
-import { 
-  Challenge, 
-  ChallengeType, 
-  UserProgress, 
+import {
+  Challenge,
+  ChallengeType,
+  UserProgress,
   ChallengeResult,
   ImageSelectionData,
   MathProblemData,
-  TextInputData 
+  TextInputData
 } from '../../models/challenge.model';
 
 @Component({
@@ -27,20 +27,20 @@ export class Captcha implements OnInit, OnDestroy {
   public currentChallenge: Challenge | null = null;
   public currentChallengeIndex: number = 0;
   public progress: UserProgress | null = null;
-  
+
   // Form data
   public selectedImageIds: string[] = [];
   public mathAnswer: number | null = null;
   public textInput: string = '';
-  
+
   // UI state
   public isLoading: boolean = true;
   public showValidation: boolean = false;
   public validationMessage: string = '';
-  
+
   // Enum reference for template
   public ChallengeType = ChallengeType;
-  
+
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -49,9 +49,15 @@ export class Captcha implements OnInit, OnDestroy {
     private challengeService: ChallengeService
   ) { }
 
+  public startNewSession(): void {
+    this.stateService.resetProgress();
+    this.challengeService.resetChallengeSet();
+    this.router.navigate(['/']);
+  }
+
   ngOnInit(): void {
-    this.loadChallenges();
     this.subscribeToProgress();
+    this.loadChallenges();
   }
 
   ngOnDestroy(): void {
@@ -73,6 +79,10 @@ export class Captcha implements OnInit, OnDestroy {
       this.stateService.progress$.subscribe(progress => {
         this.progress = progress;
         this.currentChallengeIndex = progress.currentChallengeIndex;
+        // Load current challenge when progress updates
+        if (this.challenges && this.challenges.length > 0) {
+          this.loadCurrentChallenge();
+        }
       })
     );
   }
@@ -175,12 +185,12 @@ export class Captcha implements OnInit, OnDestroy {
 
   public nextChallenge(): void {
     const nextIndex = this.currentChallengeIndex + 1;
-    
+
     if (nextIndex >= this.challenges.length) {
       // All challenges completed
-      this.stateService.updateProgress({ 
+      this.stateService.updateProgress({
         endTime: new Date(),
-        currentChallengeIndex: nextIndex 
+        currentChallengeIndex: nextIndex
       });
       this.router.navigate(['/result']);
     } else {
@@ -210,38 +220,33 @@ export class Captcha implements OnInit, OnDestroy {
   }
 
   public getImageSelectionData(): ImageSelectionData | null {
-    return this.currentChallenge?.type === ChallengeType.IMAGE_SELECTION 
-      ? this.currentChallenge.data as ImageSelectionData 
+    return this.currentChallenge?.type === ChallengeType.IMAGE_SELECTION
+      ? this.currentChallenge.data as ImageSelectionData
       : null;
   }
 
   public getMathProblemData(): MathProblemData | null {
-    return this.currentChallenge?.type === ChallengeType.MATH_PROBLEM 
-      ? this.currentChallenge.data as MathProblemData 
+    return this.currentChallenge?.type === ChallengeType.MATH_PROBLEM
+      ? this.currentChallenge.data as MathProblemData
       : null;
   }
 
   public getTextInputData(): TextInputData | null {
-    return this.currentChallenge?.type === ChallengeType.TEXT_INPUT 
-      ? this.currentChallenge.data as TextInputData 
+    return this.currentChallenge?.type === ChallengeType.TEXT_INPUT
+      ? this.currentChallenge.data as TextInputData
       : null;
   }
 
   public getImageCategory(image: any): string {
-    // For demo purposes, shows different colored placeholders
-    // In a real app, these would be actual images
-    if (image.isTarget) {
-      const data = this.getImageSelectionData();
-      return data?.target || 'target';
+    const urlParts = image.url.split('/');
+    if (urlParts.length >= 3) {
+      return urlParts[urlParts.length - 2];
     }
     return 'other';
   }
 
-  public getImageIcon(image: any): string {
-    // Show generic icons that don't reveal the answer
-    // In a real CAPTCHA, these would be actual photos
-    const genericIcons = ['📷', '🖼️', '🎨', '🌄', '📸', '�️', '🎭', '🎪', '�'];
-    const index = parseInt(image.id.split('-')[1]) || 0;
-    return genericIcons[index % genericIcons.length];
+  public onImageError(event: any): void {
+    console.error('Failed to load image:', event.target.src);
+    event.target.src = 'assets/images/placeholder.svg';
   }
 }

@@ -11,7 +11,7 @@
   width: 100%;
   max-width: 600px;
   margin-bottom: 2rem;
-  
+
   .progress-bar {
     width: 100%;
     height: 8px;
@@ -19,14 +19,14 @@
     border-radius: 4px;
     overflow: hidden;
     margin-bottom: 0.5rem;
-    
+
     .progress-fill {
       height: 100%;
       background: linear-gradient(90deg, #4caf50, #8bc34a);
       transition: width 0.3s ease;
     }
   }
-  
+
   .progress-text {
     color: white;
     font-size: 0.9rem;
@@ -60,68 +60,44 @@
 
 // Image Selection Challenge
 .image-challenge {
-  .demo-instructions {
-    background: #fff3cd;
-    border: 1px solid #ffeaa7;
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-    
-    p {
-      margin: 0;
-      color: #856404;
-    }
-    
-    strong {
-      color: #533d03;
-    }
-    
-    em {
-      color: #d68910;
-      font-weight: 600;
-    }
-  }
-  
+
   .image-grid {
     display: grid;
     gap: 8px;
     margin-bottom: 2rem;
-    
+
     &.grid-3 {
       grid-template-columns: repeat(3, 1fr);
     }
-    
+
     &.grid-4 {
       grid-template-columns: repeat(4, 1fr);
     }
   }
-  
+
   .image-item {
     position: relative;
     aspect-ratio: 1;
-    border: 2px solid #e0e0e0;
+    border: 3px solid transparent;
     border-radius: 8px;
     overflow: hidden;
-    cursor: pointer;
     transition: all 0.3s ease;
-    
+
     &:hover {
-      border-color: #667eea;
-      transform: scale(1.02);
+      border-color: #007bff;
     }
-    
+
     &.selected {
-      border-color: #4caf50;
-      border-width: 3px;
+      border-color: #28a745;
+      box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
     }
-    
+
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    
+
     .placeholder-image {
       width: 100%;
       height: 100%;
@@ -129,23 +105,23 @@
       align-items: center;
       justify-content: center;
       background: linear-gradient(135deg, #f0f2f5, #e4e6ea);
-      
+
       &[data-category="cars"] {
         background: linear-gradient(135deg, #ff6b6b, #ee5a24);
       }
-      
+
       &[data-category="traffic-lights"] {
         background: linear-gradient(135deg, #ffd93d, #6c5ce7);
       }
-      
+
       &[data-category="bicycles"] {
         background: linear-gradient(135deg, #74b9ff, #0984e3);
       }
-      
+
       &[data-category="other"] {
         background: linear-gradient(135deg, #ddd, #bbb);
       }
-      
+
       .placeholder-content {
         text-align: center;
         position: relative;
@@ -155,13 +131,13 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        
+
         .placeholder-icon {
           font-size: 2rem;
           opacity: 0.8;
           margin-bottom: 0.5rem;
         }
-        
+
         .demo-label {
           font-size: 0.6rem;
           font-weight: bold;
@@ -175,23 +151,22 @@
         }
       }
     }
-    
+
     .image-overlay {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(76, 175, 80, 0.3);
+      background-color: rgba(40, 167, 69, 0.8);
       display: flex;
       align-items: center;
       justify-content: center;
-      
+
       .checkmark {
         color: white;
         font-size: 2rem;
         font-weight: bold;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       }
     }
   }
@@ -201,7 +176,7 @@
 .math-challenge {
   text-align: center;
   margin-bottom: 2rem;
-  
+
   .math-question {
     font-size: 2rem;
     font-weight: bold;
@@ -209,7 +184,7 @@
     margin-bottom: 1.5rem;
     font-family: 'Courier New', monospace;
   }
-  
+
   .math-input {
     font-size: 1.5rem;
     padding: 1rem;
@@ -218,7 +193,7 @@
     text-align: center;
     width: 200px;
     transition: border-color 0.3s ease;
-    
+
     &:focus {
       outline: none;
       border-color: #667eea;
@@ -230,7 +205,7 @@
 .text-challenge {
   text-align: center;
   margin-bottom: 2rem;
-  
+
   .text-prompt {
     font-size: 2rem;
     font-weight: bold;
@@ -242,7 +217,7 @@
     border-radius: 8px;
     letter-spacing: 2px;
   }
-  
+
   .text-input {
     font-size: 1.2rem;
     padding: 1rem;
@@ -252,7 +227,7 @@
     width: 100%;
     max-width: 300px;
     transition: border-color 0.3s ease;
-    
+
     &:focus {
       outline: none;
       border-color: #667eea;
@@ -268,18 +243,18 @@
   opacity: 0;
   transform: translateY(-10px);
   transition: all 0.3s ease;
-  
+
   &.show {
     opacity: 1;
     transform: translateY(0);
   }
-  
+
   &.error {
     background: #ffebee;
     color: #c62828;
     border: 1px solid #ef5350;
   }
-  
+
   &:not(.error) {
     background: #e8f5e8;
     color: #2e7d32;
@@ -291,7 +266,7 @@
   display: flex;
   gap: 1rem;
   justify-content: center;
-  
+
   .btn {
     padding: 1rem 2rem;
     font-size: 1rem;
@@ -301,33 +276,33 @@
     cursor: pointer;
     transition: all 0.3s ease;
     min-width: 120px;
-    
+
     &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
-      
+
       &:hover {
         transform: none;
       }
     }
-    
+
     &:not(:disabled):hover {
       transform: translateY(-2px);
     }
-    
+
     &.btn-primary {
       background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
-      
+
       &:not(:disabled):hover {
         box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
       }
     }
-    
+
     &.btn-secondary {
       background: #f5f5f5;
       color: #333;
-      
+
       &:not(:disabled):hover {
         background: #e0e0e0;
       }
@@ -343,7 +318,7 @@
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  
+
   .spinner {
     width: 50px;
     height: 50px;
@@ -353,7 +328,7 @@
     animation: spin 1s linear infinite;
     margin-bottom: 1rem;
   }
-  
+
   p {
     font-size: 1.1rem;
     margin: 0;
@@ -361,35 +336,40 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @media (max-width: 768px) {
   .captcha-container {
     padding: 1rem;
   }
-  
+
   .challenge-card {
     padding: 1.5rem;
   }
-  
+
   .image-grid {
     gap: 4px;
   }
-  
+
   .action-buttons {
     flex-direction: column;
-    
+
     .btn {
       width: 100%;
     }
   }
-  
+
   .math-question {
     font-size: 1.5rem !important;
   }
-  
+
   .text-prompt {
     font-size: 1.5rem !important;
   }

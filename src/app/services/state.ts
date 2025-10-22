@@ -7,7 +7,7 @@ import { UserProgress, ChallengeResult } from '../models/challenge.model';
 })
 export class StateService {
   private readonly STORAGE_KEY = 'angul-it-progress';
-  
+
   private progressSubject = new BehaviorSubject<UserProgress>(this.getInitialProgress());
   public progress$ = this.progressSubject.asObservable();
 
@@ -24,8 +24,13 @@ export class StateService {
       completedChallenges: [],
       startTime: new Date(),
       score: 0,
-      totalAttempts: 0
+      totalAttempts: 0,
+      sessionId: this.generateSessionId()
     };
+  }
+
+  private generateSessionId(): string {
+    return 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
   }
 
   public getCurrentProgress(): UserProgress {
@@ -43,7 +48,7 @@ export class StateService {
     const currentResults = this.resultsSubject.value;
     const updatedResults = [...currentResults, result];
     this.resultsSubject.next(updatedResults);
-    
+
     // Update progress
     const progress = this.getCurrentProgress();
     const updatedProgress: Partial<UserProgress> = {
@@ -66,10 +71,10 @@ export class StateService {
   public getSuccessfulResults(): ChallengeResult[] {
     const allResults = this.resultsSubject.value;
     const completedChallenges = this.getCurrentProgress().completedChallenges;
-    
+
     // Return only the first successful attempt for each completed challenge
     return completedChallenges.map(challengeId => {
-      return allResults.find(result => 
+      return allResults.find(result =>
         result.challengeId === challengeId && result.isCorrect
       );
     }).filter(result => result !== undefined) as ChallengeResult[];
@@ -89,6 +94,8 @@ export class StateService {
     this.resultsSubject.next([]);
     this.saveProgressToStorage(initialProgress);
     localStorage.removeItem(this.STORAGE_KEY + '-results');
+    // Also clear challenge set to get a fresh random set on next session
+    localStorage.removeItem('angul-it-challenge-set');
   }
 
   private saveProgressToStorage(progress: UserProgress): void {
@@ -104,7 +111,7 @@ export class StateService {
     try {
       const savedProgress = localStorage.getItem(this.STORAGE_KEY);
       const savedResults = localStorage.getItem(this.STORAGE_KEY + '-results');
-      
+
       if (savedProgress) {
         const progress = JSON.parse(savedProgress);
         progress.startTime = new Date(progress.startTime);
@@ -113,7 +120,7 @@ export class StateService {
         }
         this.progressSubject.next(progress);
       }
-      
+
       if (savedResults) {
         this.resultsSubject.next(JSON.parse(savedResults));
       }
