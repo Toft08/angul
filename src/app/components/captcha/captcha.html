@@ -12,6 +12,7 @@
 
   <!-- Challenge Content -->
   <div class="challenge-card" *ngIf="currentChallenge">
+    <!-- Valid challenge content -->
     <h2 class="challenge-title">{{ currentChallenge.title }}</h2>
     <p class="challenge-description">{{ currentChallenge.description }}</p>
 
@@ -49,8 +50,12 @@
 
     <!-- Action Buttons -->
     <div class="action-buttons">
-      <button class="btn btn-secondary" [disabled]="!canGoPrevious()" (click)="previousChallenge()">
+      <button class="btn btn-secondary" *ngIf="canGoPrevious()" (click)="previousChallenge()">
         Previous
+      </button>
+      
+      <button class="btn btn-secondary" *ngIf="!canGoPrevious()" (click)="exitToHome()">
+        Exit
       </button>
 
       <button class="btn btn-primary" [disabled]="!isFormValid()" (click)="submitAnswer()">

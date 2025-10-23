@@ -100,10 +100,14 @@ export class Result implements OnInit {
 
   public startNewChallenge(): void {
     this.stateService.resetProgress();
-    this.router.navigate(['/home']);
+    this.router.navigate(['/captcha']);
   }
 
   public goHome(): void {
     this.router.navigate(['/home']);
+  }
+
+  public isPassed(): boolean {
+    return this.successRate >= 60;
   }
 }

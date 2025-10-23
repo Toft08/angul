@@ -214,6 +214,10 @@ export class Captcha implements OnInit, OnDestroy {
     return this.currentChallengeIndex > 0;
   }
 
+  public exitToHome(): void {
+    this.router.navigate(['/home']);
+  }
+
   public getProgressPercentage(): number {
     if (!this.progress || this.challenges.length === 0) return 0;
     return (this.progress.completedChallenges.length / this.challenges.length) * 100;

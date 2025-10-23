@@ -98,7 +98,7 @@ export class ChallengeService {
       {
         id: 'img-1',
         type: ChallengeType.IMAGE_SELECTION,
-        title: 'Select all images with darts',
+        title: 'Image recognition',
         description: 'Click on all squares that contain darts',
         data: {
           images: this.generateImageGrid('darts', 9),
@@ -141,7 +141,7 @@ export class ChallengeService {
       {
         id: 'img-2',
         type: ChallengeType.IMAGE_SELECTION,
-        title: 'Select all images with targets',
+        title: 'Image recognition',
         description: 'Click on all squares that contain targets',
         data: {
           images: this.generateImageGrid('targets', 9),
@@ -184,7 +184,7 @@ export class ChallengeService {
       {
         id: 'img-3',
         type: ChallengeType.IMAGE_SELECTION,
-        title: 'Select all images with discs',
+        title: 'Image recognition',
         description: 'Click on all squares that contain discs',
         data: {
           images: this.generateImageGrid('discs', 9),

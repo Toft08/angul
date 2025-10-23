@@ -5,8 +5,11 @@
       <div class="success-icon">{{ getGradeEmoji() }}</div>
       <h1 class="title">Verification Complete!</h1>
       <h2 class="grade">{{ getOverallGrade() }}</h2>
-      <p class="subtitle">
+      <p class="subtitle" *ngIf="isPassed()">
         Congratulations! You have successfully proven that you are not a bot.
+      </p>
+      <p class="subtitle" *ngIf="!isPassed()">
+        We detected some unusual activity. Please try the verification again to confirm you're human.
       </p>
     </div>
 
@@ -89,15 +92,18 @@
       
       <button 
         class="btn btn-secondary"
-        (click)="goHome()">
+        (click)="goHome()" *ngIf="isPassed()">
         Return Home
       </button>
     </div>
 
     <!-- Security Message -->
     <div class="security-section">
-      <p class="security-text">
+      <p class="security-text" *ngIf="isPassed()">
         🔒 Your verification has been recorded. You are now authenticated as a human user.
+      </p>
+      <p class="security-text" *ngIf="!isPassed()">
+        ⚠️ Verification incomplete. Please retake the test to prove you're human.
       </p>
     </div>
   </div>
