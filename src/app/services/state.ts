@@ -94,8 +94,6 @@ export class StateService {
     this.resultsSubject.next([]);
     this.saveProgressToStorage(initialProgress);
     localStorage.removeItem(STORAGE_KEYS.RESULTS);
-    // Also clear challenge set to get a fresh random set on next session
-    localStorage.removeItem(STORAGE_KEYS.CHALLENGE_SET);
   }
 
   private saveProgressToStorage(progress: UserProgress): void {
