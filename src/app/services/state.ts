@@ -94,6 +94,7 @@ export class StateService {
     this.resultsSubject.next([]);
     this.saveProgressToStorage(initialProgress);
     localStorage.removeItem(STORAGE_KEYS.RESULTS);
+    localStorage.removeItem(STORAGE_KEYS.CHALLENGES);
   }
 
   private saveProgressToStorage(progress: UserProgress): void {

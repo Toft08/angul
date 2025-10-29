@@ -18,12 +18,21 @@ export class ChallengeService {
   constructor() { }
 
   public getChallenges(): Observable<Challenge[]> {
-    // Generate a new random challenge set for each session
-    return of(this.generateRandomChallengeSet());
+    // Try to load existing challenges from storage first
+    const existingChallenges = this.loadChallengesFromStorage();
+    if (existingChallenges && existingChallenges.length > 0) {
+      return of(existingChallenges);
+    }
+
+    // Generate new challenges if none exist
+    const newChallenges = this.generateRandomChallengeSet();
+    this.saveChallengiesToStorage(newChallenges);
+    return of(newChallenges);
   }
 
   public resetChallengeSet(): void {
-    // No longer need to reset challenge sets since they're generated fresh each time
+    // Clear stored challenges to generate fresh ones next time
+    localStorage.removeItem(STORAGE_KEYS.CHALLENGES);
   } public validateAnswer(challenge: Challenge, userAnswer: any): boolean {
     switch (challenge.type) {
       case ChallengeType.IMAGE_SELECTION:
@@ -217,5 +226,25 @@ export class ChallengeService {
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     return shuffled;
+  }
+
+  private loadChallengesFromStorage(): Challenge[] | null {
+    try {
+      const savedChallenges = localStorage.getItem(STORAGE_KEYS.CHALLENGES);
+      if (savedChallenges) {
+        return JSON.parse(savedChallenges) as Challenge[];
+      }
+    } catch (error) {
+      console.warn('Failed to load challenges from localStorage:', error);
+    }
+    return null;
+  }
+
+  private saveChallengiesToStorage(challenges: Challenge[]): void {
+    try {
+      localStorage.setItem(STORAGE_KEYS.CHALLENGES, JSON.stringify(challenges));
+    } catch (error) {
+      console.warn('Failed to save challenges to localStorage:', error);
+    }
   }
 }
