@@ -8,12 +8,13 @@ import {
   TextInputData,
   ImageItem
 } from '../models/challenge.model';
+import { STORAGE_KEYS } from '../constants/storage.constants';
+import { IMAGE_CATEGORIES, ImageCategory, getImagesForCategory, getCategoryFromFilename } from '../constants/image.constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChallengeService {
-  private readonly CHALLENGE_SET_KEY = 'angul-it-challenge-set';
 
   private challengeSets: Challenge[][] = [
     this.generateChallengeSet1(),
@@ -34,12 +35,12 @@ export class ChallengeService {
   }
 
   public resetChallengeSet(): void {
-    localStorage.removeItem(this.CHALLENGE_SET_KEY);
+    localStorage.removeItem(STORAGE_KEYS.CHALLENGE_SET);
   }
 
   private getOrCreateChallengeSetId(): number {
     try {
-      const saved = localStorage.getItem(this.CHALLENGE_SET_KEY);
+      const saved = localStorage.getItem(STORAGE_KEYS.CHALLENGE_SET);
       if (saved !== null) {
         const savedId = parseInt(saved, 10);
         if (savedId >= 0 && savedId < this.challengeSets.length) {
@@ -53,7 +54,7 @@ export class ChallengeService {
     // Generate new challenge set ID if none exists or invalid
     const newId = Math.floor(Math.random() * this.challengeSets.length);
     try {
-      localStorage.setItem(this.CHALLENGE_SET_KEY, newId.toString());
+      localStorage.setItem(STORAGE_KEYS.CHALLENGE_SET, newId.toString());
     } catch (error) {
       console.warn('Failed to save challenge set to localStorage:', error);
     }
@@ -228,7 +229,7 @@ export class ChallengeService {
 
     const targetImages = this.getImagesForCategory(target);
 
-    const otherCategories = ['darts', 'discs', 'targets'].filter(cat => cat !== target);
+    const otherCategories = Object.keys(IMAGE_CATEGORIES).filter(cat => cat !== target);
     const distractorImages = otherCategories.flatMap(cat => this.getImagesForCategory(cat));
 
     // Add target images
@@ -257,27 +258,12 @@ export class ChallengeService {
   }
 
   private getImagesForCategory(category: string): string[] {
-    switch (category) {
-      case 'darts':
-        return ['DL.jpg', 'JDG.jpg', 'OL.jpg', 'SL.jpg'];
-      case 'discs':
-        return ['buzzz.jpg', 'fd3.jpg', 'reko.jpg', 'zone.jpg'];
-      case 'targets':
-        return ['BD.jpg', 'DK.jpg', 'DKP.jpg', 'WD.jpg'];
-      default:
-        return [];
-    }
+    return getImagesForCategory(category as ImageCategory);
   }
 
   private getCategoryFromImage(imageName: string): string {
-    const dartImages = ['DL.jpg', 'JDG.jpg', 'OL.jpg', 'SL.jpg'];
-    const discImages = ['buzzz.jpg', 'fd3.jpg', 'reko.jpg', 'zone.jpg'];
-    const targetImages = ['BD.jpg', 'DK.jpg', 'DKP.jpg', 'WD.jpg'];
-
-    if (dartImages.includes(imageName)) return 'darts';
-    if (discImages.includes(imageName)) return 'discs';
-    if (targetImages.includes(imageName)) return 'targets';
-    return 'other';
+    const result = getCategoryFromFilename(imageName);
+    return result === 'unknown' ? 'other' : result;
   }
 
   private shuffleArray<T>(array: T[]): T[] {

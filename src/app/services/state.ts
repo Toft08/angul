@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { UserProgress, ChallengeResult } from '../models/challenge.model';
+import { STORAGE_KEYS } from '../constants/storage.constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StateService {
-  private readonly STORAGE_KEY = 'angul-it-progress';
 
   private progressSubject = new BehaviorSubject<UserProgress>(this.getInitialProgress());
   public progress$ = this.progressSubject.asObservable();
@@ -93,15 +93,15 @@ export class StateService {
     this.progressSubject.next(initialProgress);
     this.resultsSubject.next([]);
     this.saveProgressToStorage(initialProgress);
-    localStorage.removeItem(this.STORAGE_KEY + '-results');
+    localStorage.removeItem(STORAGE_KEYS.RESULTS);
     // Also clear challenge set to get a fresh random set on next session
-    localStorage.removeItem('angul-it-challenge-set');
+    localStorage.removeItem(STORAGE_KEYS.CHALLENGE_SET);
   }
 
   private saveProgressToStorage(progress: UserProgress): void {
     try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(progress));
-      localStorage.setItem(this.STORAGE_KEY + '-results', JSON.stringify(this.resultsSubject.value));
+      localStorage.setItem(STORAGE_KEYS.PROGRESS, JSON.stringify(progress));
+      localStorage.setItem(STORAGE_KEYS.RESULTS, JSON.stringify(this.resultsSubject.value));
     } catch (error) {
       console.warn('Failed to save progress to localStorage:', error);
     }
@@ -109,8 +109,8 @@ export class StateService {
 
   private loadProgressFromStorage(): void {
     try {
-      const savedProgress = localStorage.getItem(this.STORAGE_KEY);
-      const savedResults = localStorage.getItem(this.STORAGE_KEY + '-results');
+      const savedProgress = localStorage.getItem(STORAGE_KEYS.PROGRESS);
+      const savedResults = localStorage.getItem(STORAGE_KEYS.RESULTS);
 
       if (savedProgress) {
         const progress = JSON.parse(savedProgress);

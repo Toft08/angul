@@ -177,18 +177,7 @@ export class Captcha implements OnInit, OnDestroy {
     }
 
     if (!this.currentChallenge || !this.isFormValid()) {
-      const formData = {
-        selectedImageIds: this.selectedImageIds,
-        mathAnswer: this.mathAnswer,
-        textInput: this.textInput
-      };
-      
-      const validationResult = this.validationService.validateFormCompletion(
-        this.currentChallenge?.type || 'unknown', 
-        formData
-      );
-      
-      this.showValidationMessage(validationResult.message);
+      this.showValidationMessage('Please complete the challenge before proceeding.');
       return;
     }
 
