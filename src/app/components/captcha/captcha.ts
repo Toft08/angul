@@ -55,6 +55,17 @@ export class Captcha implements OnInit, OnDestroy {
     this.router.navigate(['/']);
   }
 
+  public isCurrentChallengeCompleted(): boolean {
+    if (!this.currentChallenge || !this.progress) return false;
+    return this.progress.completedChallenges.includes(this.currentChallenge.id);
+  }
+
+  public getCurrentChallengeResult(): ChallengeResult | null {
+    if (!this.currentChallenge) return null;
+    const attempts = this.stateService.getChallengeAttempts(this.currentChallenge.id);
+    return attempts.find(attempt => attempt.isCorrect) || null;
+  }
+
   ngOnInit(): void {
     this.subscribeToProgress();
     this.loadChallenges();
@@ -91,6 +102,31 @@ export class Captcha implements OnInit, OnDestroy {
     if (this.challenges && this.challenges.length > this.currentChallengeIndex) {
       this.currentChallenge = this.challenges[this.currentChallengeIndex];
       this.resetForm();
+
+      // If challenge is completed, load the correct answer to display
+      if (this.isCurrentChallengeCompleted()) {
+        this.loadCorrectAnswer();
+      }
+    }
+  }
+
+  private loadCorrectAnswer(): void {
+    if (!this.currentChallenge) return;
+
+    const correctResult = this.getCurrentChallengeResult();
+    if (!correctResult) return;
+
+    // Load the correct answer based on challenge type
+    switch (this.currentChallenge.type) {
+      case ChallengeType.IMAGE_SELECTION:
+        this.selectedImageIds = [...(correctResult.userAnswer as string[])];
+        break;
+      case ChallengeType.MATH_PROBLEM:
+        this.mathAnswer = correctResult.userAnswer as number;
+        break;
+      case ChallengeType.TEXT_INPUT:
+        this.textInput = correctResult.userAnswer as string;
+        break;
     }
   }
 
@@ -103,6 +139,9 @@ export class Captcha implements OnInit, OnDestroy {
   }
 
   public onImageSelect(imageId: string): void {
+    // Prevent interaction if challenge is already completed
+    if (this.isCurrentChallengeCompleted()) return;
+
     const index = this.selectedImageIds.indexOf(imageId);
     if (index > -1) {
       this.selectedImageIds.splice(index, 1);
@@ -131,8 +170,25 @@ export class Captcha implements OnInit, OnDestroy {
   }
 
   public submitAnswer(): void {
+    // If challenge is already completed, just move to next
+    if (this.isCurrentChallengeCompleted()) {
+      this.nextChallenge();
+      return;
+    }
+
     if (!this.currentChallenge || !this.isFormValid()) {
-      this.showValidationMessage('Please complete the challenge before proceeding.');
+      const formData = {
+        selectedImageIds: this.selectedImageIds,
+        mathAnswer: this.mathAnswer,
+        textInput: this.textInput
+      };
+      
+      const validationResult = this.validationService.validateFormCompletion(
+        this.currentChallenge?.type || 'unknown', 
+        formData
+      );
+      
+      this.showValidationMessage(validationResult.message);
       return;
     }
 

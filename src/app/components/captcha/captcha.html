@@ -12,48 +12,63 @@
 
   <!-- Challenge Content -->
   <div class="challenge-card" *ngIf="currentChallenge">
-    <!-- Valid challenge content -->
     <h2 class="challenge-title">{{ currentChallenge.title }}</h2>
     <p class="challenge-description">{{ currentChallenge.description }}</p>
 
-    <!-- Image Selection Challenge -->
-    <div *ngIf="currentChallenge.type === ChallengeType.IMAGE_SELECTION" class="image-challenge">
-      <div class="image-grid" [class]="'grid-' + getImageSelectionData()?.gridSize">
-        <div *ngFor="let image of getImageSelectionData()?.images" class="image-item"
-          [class.selected]="isImageSelected(image.id)" (click)="onImageSelect(image.id)">
-          <img [src]="image.url" [alt]="" image.alt class="captcha-image" [attr.data-category]="getImageCategory(image)"
-            (error)="onImageError($event)" loading="lazy">
-          <div class="image-overlay" *ngIf="isImageSelected(image.id)">
-            <span class="checkmark">✓</span>
-          </div>
+    <!-- Challenge content area with overlay -->
+    <div class="challenge-content-area">
+      <!-- Completed Challenge Overlay (only covers challenge content) -->
+      <div class="completed-overlay" *ngIf="isCurrentChallengeCompleted()">
+        <div class="completed-content">
+          <div class="completed-icon">✓</div>
+          <div class="completed-text">PASSED</div>
+          <div class="completed-subtext">Challenge completed successfully</div>
         </div>
       </div>
-    </div>
 
-    <!-- Math Problem Challenge -->
-    <div *ngIf="currentChallenge.type === ChallengeType.MATH_PROBLEM" class="math-challenge">
-      <div class="math-question">{{ getMathProblemData()?.question }}</div>
-      <input type="number" class="math-input" [(ngModel)]="mathAnswer" placeholder="Enter your answer" min="0">
-    </div>
+      <!-- Challenge interactive content (dimmed when completed) -->
+      <div [class.challenge-completed]="isCurrentChallengeCompleted()">
 
-    <!-- Text Input Challenge -->
-    <div *ngIf="currentChallenge.type === ChallengeType.TEXT_INPUT" class="text-challenge">
-      <div class="text-prompt">{{ getTextInputData()?.prompt }}</div>
-      <input type="text" class="text-input" [(ngModel)]="textInput" placeholder="Type the text exactly as shown">
-    </div>
+        <!-- Image Selection Challenge -->
+        <div *ngIf="currentChallenge.type === ChallengeType.IMAGE_SELECTION" class="image-challenge">
+          <div class="image-grid" [class]="'grid-' + getImageSelectionData()?.gridSize">
+            <div *ngFor="let image of getImageSelectionData()?.images" class="image-item"
+              [class.selected]="isImageSelected(image.id)" (click)="onImageSelect(image.id)">
+              <img [src]="image.url" [alt]="" image.alt class="captcha-image"
+                [attr.data-category]="getImageCategory(image)" (error)="onImageError($event)" loading="lazy">
+              <div class="image-overlay" *ngIf="isImageSelected(image.id)">
+                <span class="checkmark">✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <!-- Validation Message -->
-    <div class="validation-message" [class.show]="showValidation"
-      [class.error]="validationMessage.includes('Incorrect') || validationMessage.includes('Please')">
-      {{ validationMessage }}
-    </div>
+        <!-- Math Problem Challenge -->
+        <div *ngIf="currentChallenge.type === ChallengeType.MATH_PROBLEM" class="math-challenge">
+          <div class="math-question">{{ getMathProblemData()?.question }}</div>
+          <input type="number" class="math-input" [(ngModel)]="mathAnswer" placeholder="Enter your answer" min="0">
+        </div>
+
+        <!-- Text Input Challenge -->
+        <div *ngIf="currentChallenge.type === ChallengeType.TEXT_INPUT" class="text-challenge">
+          <div class="text-prompt">{{ getTextInputData()?.prompt }}</div>
+          <input type="text" class="text-input" [(ngModel)]="textInput" placeholder="Type the text exactly as shown">
+        </div>
+
+        <!-- Validation Message -->
+        <div class="validation-message" [class.show]="showValidation"
+          [class.error]="validationMessage.includes('Incorrect') || validationMessage.includes('Please')">
+          {{ validationMessage }}
+        </div>
+      </div> <!-- Close challenge-completed div -->
+    </div> <!-- Close challenge-content-area -->
 
     <!-- Action Buttons -->
     <div class="action-buttons">
       <button class="btn btn-secondary" *ngIf="canGoPrevious()" (click)="previousChallenge()">
         Previous
       </button>
-      
+
       <button class="btn btn-secondary" *ngIf="!canGoPrevious()" (click)="exitToHome()">
         Exit
       </button>
